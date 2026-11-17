@@ -39,66 +39,54 @@
     }
     .box-grid {
       display: grid;
-      grid-template-columns: 46px repeat(4, 1fr);
-      gap: 3px 2px;
+      grid-template-columns: 16px repeat(4, 1fr);
+      gap: 5px 4px;
       align-items: center;
     }
     .box-hdr {
       font-size: 10px;
       font-weight: 800;
       text-align: center;
-      padding: 4px 0;
+      padding: 3px 0;
       color: #38bdf8;
       background: #0f172a;
       border-radius: 6px;
     }
-    .box-lbl {
-      font-size: 9px;
-      font-weight: 600;
-      color: #94a3b8;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      margin: 0 auto;
+      box-shadow: 0 0 6px rgba(255,255,255,.15);
     }
-    .box-cell {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0f172a;
-      border-radius: 6px;
-      padding: 2px 0;
-    }
-    .mini {
-      width: 22px;
-      height: 26px;
-      padding: 0;
-      border: none;
-      border-radius: 4px;
+    .cell-inp {
+      width: 100%;
+      padding: 7px 2px;
       font-size: 14px;
       font-weight: 800;
-      color: #fff;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: inherit;
-      transition: transform .08s;
-    }
-    .mini:active { transform: scale(.9); }
-    .minus { background: #ef4444; }
-    .plus { background: #22c55e; }
-    .bqty {
-      min-width: 22px;
       text-align: center;
-      font-size: 12px;
-      font-weight: 800;
+      background: #0f172a;
       color: #fff;
-      padding: 0 1px;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      font-family: inherit;
+      -moz-appearance: textfield;
+      transition: border-color .15s;
+    }
+    .cell-inp:focus {
+      outline: none;
+      border-color: #38bdf8;
+      background: #0b1220;
+    }
+    .cell-inp::-webkit-outer-spin-button,
+    .cell-inp::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
     .goal-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
+      gap: 5px;
     }
     .goal-col { text-align: center; }
     .goal-name {
@@ -109,7 +97,7 @@
     }
     .goal-inp {
       width: 100%;
-      padding: 5px 2px;
+      padding: 6px 2px;
       font-size: 14px;
       font-weight: 800;
       text-align: center;
@@ -119,6 +107,10 @@
       border-radius: 6px;
       font-family: inherit;
       -moz-appearance: textfield;
+    }
+    .goal-inp:focus {
+      outline: none;
+      border-color: #38bdf8;
     }
     .goal-inp::-webkit-outer-spin-button,
     .goal-inp::-webkit-inner-spin-button {
@@ -159,52 +151,36 @@
       margin-top: 2px;
       line-height: 1.4;
     }
-    .timers { display: flex; flex-direction: column; gap: 4px; }
-    .timer-row {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 0;
-      border-bottom: 1px solid #334155;
+    .total-time-card {
+      text-align: center;
+      padding: 14px 8px;
     }
-    .timer-row:last-child { border-bottom: none; }
-    .timer-name {
-      font-size: 10px;
+    .total-time-card h2 {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .total-time-val {
+      font-size: 26px;
       font-weight: 800;
       color: #38bdf8;
-      width: 42px;
+      letter-spacing: 1px;
+      font-variant-numeric: tabular-nums;
     }
-    .timer-btn {
-      width: 26px;
-      height: 26px;
-      padding: 0;
-      border: none;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 800;
-      color: #fff;
+    .total-time-lbl {
+      font-size: 10px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    .done-badge {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 3px 10px;
       background: #22c55e;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .timer-btn.stop { background: #f59e0b; }
-    .timer-btn.reset { background: #475569; }
-    .timer-txt {
-      flex: 1;
+      color: #fff;
       font-size: 11px;
       font-weight: 800;
-      color: #38bdf8;
-      text-align: center;
-      font-variant-numeric: tabular-nums;
+      border-radius: 12px;
     }
-    .timer-left {
-      font-size: 9px;
-      color: #94a3b8;
-      text-align: right;
-      min-width: 60px;
-      font-variant-numeric: tabular-nums;
-    }
-    .timer-left b { color: #facc15; }
   </style>
 </head>
 <body>
@@ -221,9 +197,11 @@
   <div class="goal-grid" id="goalGrid"></div>
 </div>
 
-<div class="card">
-  <h2>Timery</h2>
-  <div class="timers" id="timersList"></div>
+<div class="card total-time-card">
+  <h2>Suma czasu do celu</h2>
+  <div class="total-time-val" id="totalTime">0m</div>
+  <div class="total-time-lbl">wszystkie zasoby razem</div>
+  <div id="totalDone"></div>
 </div>
 
 <script>
@@ -235,11 +213,11 @@ const RESOURCES = [
 ];
 
 const TYPES = [
-  { key:'szara',    name:'Szara',    mult:1   },
-  { key:'zielona',  name:'Zielona',  mult:4   },
-  { key:'niebieska',name:'Niebieska',mult:16  },
-  { key:'fioletowa',name:'Fioletowa',mult:64  },
-  { key:'zlota',    name:'Złota',    mult:256 }
+  { key:'szara',    name:'Szara',    mult:1,   color:'#94a3b8' },
+  { key:'zielona',  name:'Zielona',  mult:4,   color:'#22c55e' },
+  { key:'niebieska',name:'Niebieska',mult:16,  color:'#3b82f6' },
+  { key:'fioletowa',name:'Fioletowa',mult:64,  color:'#a855f7' },
+  { key:'zlota',    name:'Złota',    mult:256, color:'#facc15' }
 ];
 
 const BASE_HOURS = 3;
@@ -282,11 +260,19 @@ function fmtDHM(hours) {
   return m + 'm';
 }
 
-function totalGrey(res) {
-  const c = state.data[res].counts;
+function totalGrey(resKey) {
+  const c = state.data[resKey].counts;
   let sum = 0;
   TYPES.forEach(t => sum += c[t.key] * t.mult);
   return sum;
+}
+
+function remainingHours(resKey) {
+  const data = state.data[resKey];
+  const total = totalGrey(resKey);
+  const goalGrey = data.goal * GOLDEN_MULT;
+  const left = Math.max(0, goalGrey - total);
+  return left * BOX_TIME_HOURS;
 }
 
 function buildSkrzynie() {
@@ -296,13 +282,11 @@ function buildSkrzynie() {
     html += `<div class="box-hdr">${r.name}</div>`;
   });
   TYPES.forEach(t => {
-    html += `<div class="box-lbl">${t.name}</div>`;
+    html += `<div class="dot" style="background:${t.color}" title="${t.name}"></div>`;
     RESOURCES.forEach(r => {
-      html += `<div class="box-cell">
-        <button class="mini minus" data-res="${r.key}" data-type="${t.key}" data-d="-1">−</button>
-        <span class="bqty" data-qty="${r.key}-${t.key}">0</span>
-        <button class="mini plus" data-res="${r.key}" data-type="${t.key}" data-d="1">+</button>
-      </div>`;
+      const val = state.data[r.key].counts[t.key];
+      html += `<input class="cell-inp" type="number" min="0" step="1" inputmode="numeric"
+        data-res="${r.key}" data-type="${t.key}" value="${val}">`;
     });
   });
   el.innerHTML = html;
@@ -314,7 +298,8 @@ function buildGoals() {
   RESOURCES.forEach(r => {
     html += `<div class="goal-col">
       <div class="goal-name">${r.name}</div>
-      <input class="goal-inp" type="number" min="0" step="1" inputmode="numeric" data-goal="${r.key}" value="${state.data[r.key].goal}">
+      <input class="goal-inp" type="number" min="0" step="1" inputmode="numeric"
+        data-goal="${r.key}" value="${state.data[r.key].goal}">
       <div class="goal-bar-wrap">
         <div class="goal-bar" data-goalbar="${r.key}"></div>
         <span class="goal-pct" data-goalpct="${r.key}">0%</span>
@@ -326,38 +311,13 @@ function buildGoals() {
   el.innerHTML = html;
 }
 
-function buildTimers() {
-  const el = document.getElementById('timersList');
-  let html = '';
-  RESOURCES.forEach(r => {
-    html += `<div class="timer-row">
-      <span class="timer-name">${r.name}</span>
-      <button class="timer-btn" data-tstart="${r.key}">▶</button>
-      <button class="timer-btn reset" data-treset="${r.key}">↺</button>
-      <span class="timer-txt" data-ttime="${r.key}">00:00:00</span>
-      <span class="timer-left" data-tleft="${r.key}"></span>
-    </div>`;
-  });
-  el.innerHTML = html;
-}
-
-function refreshCounts() {
-  RESOURCES.forEach(r => {
-    const c = state.data[r.key].counts;
-    TYPES.forEach(t => {
-      const el = document.querySelector(`[data-qty="${r.key}-${t.key}"]`);
-      if (el) el.textContent = c[t.key];
-    });
-  });
-}
-
 function refreshGoal(resKey) {
   const data = state.data[resKey];
   const total = totalGrey(resKey);
   const goalGrey = data.goal * GOLDEN_MULT;
   const pct = goalGrey > 0 ? Math.min(100, (total/goalGrey)*100) : 0;
   const left = Math.max(0, goalGrey - total);
-  const isComplete = pct >= 100;
+  const isComplete = goalGrey > 0 && total >= goalGrey;
 
   const bar = document.querySelector(`[data-goalbar="${resKey}"]`);
   const pctEl = document.querySelector(`[data-goalpct="${resKey}"]`);
@@ -376,44 +336,33 @@ function refreshGoal(resKey) {
   }
 }
 
-function refreshTimers() {
-  RESOURCES.forEach(r => {
-    const data = state.data[r.key];
-    const timeEl = document.querySelector(`[data-ttime="${r.key}"]`);
-    const leftEl = document.querySelector(`[data-tleft="${r.key}"]`);
-    const btn = document.querySelector(`[data-tstart="${r.key}"]`);
-    if (!timeEl) return;
+function refreshSum() {
+  let totalHours = 0;
+  RESOURCES.forEach(r => totalHours += remainingHours(r.key));
 
+  const val = document.getElementById('totalTime');
+  const done = document.getElementById('totalDone');
+  val.textContent = fmtDHM(totalHours);
+
+  const allDone = RESOURCES.every(r => {
     const total = totalGrey(r.key);
-    const goalGrey = data.goal * GOLDEN_MULT;
-    const left = Math.max(0, goalGrey - total);
-    if (leftEl) leftEl.innerHTML = `<b>${fmtDHM(left * BOX_TIME_HOURS)}</b>`;
-
-    if (!data.timerStart) {
-      timeEl.textContent = '00:00:00';
-      if (btn) { btn.textContent = '▶'; btn.classList.remove('stop'); }
-      return;
-    }
-    const diffMs = Date.now() - data.timerStart;
-    const totalSec = Math.floor(diffMs / 1000);
-    const d = Math.floor(totalSec / 86400);
-    const hh = String(Math.floor((totalSec % 86400) / 3600)).padStart(2,'0');
-    const mm = String(Math.floor((totalSec % 3600) / 60)).padStart(2,'0');
-    const ss = String(totalSec % 60).padStart(2,'0');
-    timeEl.textContent = (d > 0 ? d + 'd ' : '') + `${hh}:${mm}:${ss}`;
-    if (btn) { btn.textContent = '⏸'; btn.classList.add('stop'); }
+    const goalGrey = state.data[r.key].goal * GOLDEN_MULT;
+    return goalGrey > 0 && total >= goalGrey;
   });
+
+  done.innerHTML = allDone ? '<span class="done-badge">✓ WSZYSTKIE CELE OSIĄGNIĘTE</span>' : '';
 }
 
-document.getElementById('boxGrid').addEventListener('click', e => {
-  const btn = e.target.closest('button.mini');
-  if (!btn) return;
-  const { res, type, d } = btn.dataset;
-  state.data[res].counts[type] = Math.max(0, state.data[res].counts[type] + parseInt(d));
+document.getElementById('boxGrid').addEventListener('input', e => {
+  const inp = e.target.closest('.cell-inp');
+  if (!inp) return;
+  const res = inp.dataset.res;
+  const type = inp.dataset.type;
+  const val = Math.max(0, parseInt(inp.value) || 0);
+  state.data[res].counts[type] = val;
   save();
-  refreshCounts();
   refreshGoal(res);
-  refreshTimers();
+  refreshSum();
 });
 
 document.getElementById('goalGrid').addEventListener('input', e => {
@@ -423,34 +372,13 @@ document.getElementById('goalGrid').addEventListener('input', e => {
   state.data[res].goal = Math.max(0, parseInt(inp.value) || 0);
   save();
   refreshGoal(res);
-  refreshTimers();
-});
-
-document.getElementById('timersList').addEventListener('click', e => {
-  const btn = e.target.closest('button');
-  if (!btn) return;
-  if (btn.dataset.tstart) {
-    const res = btn.dataset.tstart;
-    const data = state.data[res];
-    if (data.timerStart) data.timerStart = null;
-    else data.timerStart = Date.now();
-    save();
-    refreshTimers();
-  } else if (btn.dataset.treset) {
-    state.data[btn.dataset.treset].timerStart = null;
-    save();
-    refreshTimers();
-  }
+  refreshSum();
 });
 
 buildSkrzynie();
 buildGoals();
-buildTimers();
-refreshCounts();
 RESOURCES.forEach(r => refreshGoal(r.key));
-refreshTimers();
-
-setInterval(refreshTimers, 1000);
+refreshSum();
 </script>
 </body>
 </html>
