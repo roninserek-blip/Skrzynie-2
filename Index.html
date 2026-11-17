@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#1F2937">
+<title>Licznik Skrzyń</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #0f172a; color: #e2e8f0; padding: 12px;
+    padding-bottom: 80px;
+  }
+  h1 { font-size: 20px; text-align: center; margin: 8px 0 16px;
+       color: #fff; letter-spacing: 1px; }
+  .card {
+    background: #1e293b; border-radius: 14px; padding: 12px;
+    margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.35);
+  }
+  .card h2 {
+    font-size: 13px; margin: 0 0 10px; text-transform: uppercase;
+    color: #94a3b8; letter-spacing: 1px;
+  }
+  .row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 0; border-bottom: 1px solid #334155;
+  }
+  .row:last-child { border-bottom: none; }
+  .name { flex: 1; font-weight: 600; font-size: 15px; }
+  .name small { display: block; color: #64748b; font-weight: 400;
+    font-size: 11px; }
+  .btns { display: flex; align-items: center; gap: 6px; }
+  button {
+    font-family: inherit; cursor: pointer; border: none;
+    border-radius: 10px; font-weight: 700; color: #fff;
+    font-size: 20px; width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .08s, background .15s;
+  }
+  button:active { transform: scale(.92); }
+  .minus { background: #ef4444; }
+  .plus  { background: #22c55e; }
+  .qty {
+    min-width: 46px; text-align: center; font-size: 18px;
+    font-weight: 700; color: #fff;
+  }
+  .big {
+    font-size: 26px; font-weight: 800; color: #38bdf8;
+    text-align: center; padding: 4px 0;
+  }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat {
+    background: #0f172a; border-radius: 10px; padding: 10px;
+    text-align: center;
+  }
+  .stat .lbl { font-size: 11px; color: #94a3b8; text-transform: uppercase;
+    letter-spacing: .5px; margin-bottom: 4px; }
+  .stat .val { font-size: 18px; font-weight: 800; color: #fff; }
+  .stat .val.g { color: #22c55e; }
+  .stat .val.y { color: #facc15; }
+  .stat .val.b { color: #38bdf8; }
+  .progress-wrap {
+    background: #0f172a; border-radius: 10px; height: 26px;
+    overflow: hidden; position: relative; margin-top: 10px;
+  }
+  .progress-bar {
+    height: 100%; background: linear-gradient(90deg,#22c55e,#16a34a);
+    width: 0%; transition: width .3s; border-radius: 10px;
+  }
+  .progress-text {
+    position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,.6);
+  }
+  .conv-row {
+    display: flex; justify-content: space-between;
+    padding: 6px 0; border-bottom: 1px solid #334155;
+    font-size: 15px;
+  }
+  .conv-row:last-child { border-bottom: none; }
+  .conv-row b { color: #facc15; font-size: 17px; }
+  .goal-input {
+    display: flex; gap: 8px; align-items: center;
+    margin-top: 8px;
+  }
+  .goal-input input {
+    flex: 1; background: #0f172a; border: 1px solid #334155;
+    color: #fff; font-size: 18px; padding: 10px; border-radius: 10px;
+    font-weight: 700; text-align: center;
+  }
+  .timer-row { display: flex; gap: 8px; margin-top: 6px; }
+  .timer-row button {
+    flex: 1; width: auto; height: 50px; font-size: 15px;
+  }
+  .btn-start { background: #22c55e; }
+  .btn-reset { background: #64748b; }
+  .timer-time {
+    text-align: center; font-size: 30px; font-weight: 800;
+    color: #38bdf8; letter-spacing: 2px; padding: 8px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .timer-info {
+    text-align: center; color: #94a3b8; font-size: 13px;
+    margin-top: 4px;
+  }
+  .reset-all {
+    width: 100%; height: 46px; background: #dc2626;
+    font-size: 14px; margin-top: 8px; border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+
+<h1>📦 LICZNIK SKRZYŃ</h1>
+
+<div class="card">
+  <h2>Twoje skrzynie</h2>
+  <div id="counters"></div>
+</div>
+
+<div class="card">
+  <h2>Podsumowanie</h2>
+  <div class="big" id="totalBoxes">0 szarych</div>
+  <div class="stats" style="margin-top:10px">
+    <div class="stat"><div class="lbl">Czas prod.</div><div class="val" id="totalTime">0:00</div></div>
+    <div class="stat"><div class="lbl">W minutach</div><div class="val" id="totalMin">0 min</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Postęp do celu</h2>
+  <div class="goal-input">
+    <span style="font-size:13px;color:#94a3b8">Cel (szare):</span>
+    <input type="number" id="goal" value="256" min="0" inputmode="numeric">
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar" id="pbar"></div>
+    <div class="progress-text" id="ptext">0%</div>
+  </div>
+  <div class="stats" style="margin-top:10px">
+    <div class="stat"><div class="lbl">Zostało szarych</div><div class="val y" id="leftBoxes">256</div></div>
+    <div class="stat"><div class="lbl">Zostało czasu</div><div class="val y" id="leftTime">51:12</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Najwyższe skrzynie</h2>
+  <div id="conversion"></div>
+</div>
+
+<div class="card">
+  <h2>⏱ Timer produkcji</h2>
+  <div class="timer-time" id="timerTime">00:00:00</div>
+  <div class="timer-info" id="timerInfo">Kliknij START, aby zacząć</div>
+  <div class="timer-row">
+    <button class="btn-start" id="btnStart">▶ START</button>
+    <button class="btn-reset" id="btnReset">↺ RESET</button>
+  </div>
+  <div class="timer-info" id="timerProd" style="margin-top:8px;color:#22c55e;font-weight:700"></div>
+</div>
+
+<button class="reset-all" id="resetAll">🗑 Wyczyść wszystkie skrzynie</button>
+
+<script>
+const TYPES = [
+  { key:'szara',    name:'Szara',    mult:1,   time:1  },
+  { key:'zielona',  name:'Zielona',  mult:4,   time:4  },
+  { key:'niebieska',name:'Niebieska',mult:16,  time:16 },
+  { key:'fioletowa',name:'Fioletowa',mult:64,  time:64 },
+  { key:'zlota',    name:'Złota',    mult:256, time:256}
+];
+
+const BASE_HOURS = 3;
+const BASE_BOXES = 15;
+const BOX_TIME_HOURS = BASE_HOURS / BASE_BOXES; // 0.2h = 12 min
+
+let state = load() || {
+  counts: { szara:0, zielona:0, niebieska:0, fioletowa:0, zlota:0 },
+  goal: 256,
+  timerStart: null
+};
+
+function load() {
+  try { return JSON.parse(localStorage.getItem('skrzynie')); } catch(e){ return null; }
+}
+function save() {
+  localStorage.setItem('skrzynie', JSON.stringify(state));
+}
+
+function fmtHM(hours) {
+  const totalMin = Math.round(hours * 60);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return h + ':' + String(m).padStart(2,'0');
+}
+
+function render() {
+  const c = state.counts;
+
+  // liczniki
+  const counters = document.getElementById('counters');
+  counters.innerHTML = '';
+  TYPES.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <div class="name">${t.name}<small>${t.mult} szarych</small></div>
+      <div class="btns">
+        <button class="minus" data-k="${t.key}" data-d="-1">−</button>
+        <div class="qty" id="q-${t.key}">${c[t.key]}</div>
+        <button class="plus" data-k="${t.key}" data-d="1">+</button>
+      </div>`;
+    counters.appendChild(row);
+  });
+  counters.querySelectorAll('button').forEach(b => {
+    b.onclick = () => {
+      const k = b.dataset.k;
+      const d = parseInt(b.dataset.d);
+      state.counts[k] = Math.max(0, state.counts[k] + d);
+      save(); render();
+    };
+  });
+
+  // suma szarych
+  let totalS = 0;
+  TYPES.forEach(t => totalS += c[t.key] * t.mult);
+
+  document.getElementById('totalBoxes').textContent = totalS + ' szarych';
+
+  const totalHours = totalS * BOX_TIME_HOURS;
+  document.getElementById('totalTime').textContent = fmtHM(totalHours);
+  document.getElementById('totalMin').textContent = Math.round(totalHours*60) + ' min';
+
+  // postęp
+  const goal = state.goal || 0;
+  const pct = goal > 0 ? Math.min(100, (totalS/goal)*100) : 0;
+  document.getElementById('pbar').style.width = pct + '%';
+  document.getElementById('ptext').textContent = pct.toFixed(0) + '%';
+
+  const left = Math.max(0, goal - totalS);
+  document.getElementById('leftBoxes').textContent = left;
+  document.getElementById('leftTime').textContent = fmtHM(left * BOX_TIME_HOURS);
+
+  // przeliczenie na najwyższe
+  const conv = document.getElementById('conversion');
+  const vals = [
+    ['Złote',    Math.floor(totalS/256)],
+    ['Fioletowe',Math.floor((totalS%256)/64)],
+    ['Niebieskie',Math.floor((totalS%64)/16)],
+    ['Zielone',  Math.floor((totalS%16)/4)],
+    ['Szare',    totalS%4]
+  ];
+  conv.innerHTML = vals.map(v =>
+    `<div class="conv-row"><span>${v[0]}</span><b>${v[1]}</b></div>`
+  ).join('');
+}
+
+document.getElementById('goal').addEventListener('input', e => {
+  state.goal = parseInt(e.target.value) || 0;
+  save(); render();
+});
+document.getElementById('goal').value = state.goal;
+
+document.getElementById('resetAll').onclick = () => {
+  if (!confirm('Wyczyścić wszystkie skrzynie?')) return;
+  TYPES.forEach(t => state.counts[t.key] = 0);
+  save(); render();
+};
+
+// TIMER
+let timerInterval = null;
+
+function tickTimer() {
+  if (!state.timerStart) {
+    document.getElementById('timerTime').textContent = '00:00:00';
+    document.getElementById('timerInfo').textContent = 'Kliknij START, aby zacząć';
+    document.getElementById('timerProd').textContent = '';
+    return;
+  }
+  const diffMs = Date.now() - state.timerStart;
+  const s = Math.floor(diffMs/1000);
+  const hh = String(Math.floor(s/3600)).padStart(2,'0');
+  const mm = String(Math.floor((s%3600)/60)).padStart(2,'0');
+  const ss = String(s%60).padStart(2,'0');
+  document.getElementById('timerTime').textContent = `${hh}:${mm}:${ss}`;
+  document.getElementById('timerInfo').textContent = 'Produkcja w toku…';
+
+  const hours = diffMs / 3600000;
+  const produced = Math.floor(hours / BOX_TIME_HOURS);
+  document.getElementById('timerProd').textContent =
+    `Wyprodukowano: ${produced} szarych skrzyń`;
+}
+
+document.getElementById('btnStart').onclick = () => {
+  if (state.timerStart) {
+    state.timerStart = null;
+    document.getElementById('btnStart').textContent = '▶ START';
+  } else {
+    state.timerStart = Date.now();
+    document.getElementById('btnStart').textContent = '⏸ STOP';
+  }
+  save();
+  tickTimer();
+};
+
+document.getElementById('btnReset').onclick = () => {
+  state.timerStart = null;
+  document.getElementById('btnStart').textContent = '▶ START';
+  save();
+  tickTimer();
+};
+
+if (state.timerStart) {
+  document.getElementById('btnStart').textContent = '⏸ STOP';
+}
+
+setInterval(tickTimer, 1000);
+tickTimer();
+render();
+</script>
+</body>
+</html>
