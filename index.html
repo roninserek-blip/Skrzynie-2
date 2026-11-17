@@ -1,125 +1,230 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="theme-color" content="#1F2937">
-<title>Licznik Skrzyń</title>
-<style>
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body {
-    margin: 0; font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: #0f172a; color: #e2e8f0; padding: 10px;
-    padding-bottom: 24px;
-  }
-  h1 { font-size: 17px; text-align: center; margin: 4px 0 12px;
-       color: #fff; letter-spacing: 1px; }
-
-  .res-card {
-    background: #1e293b; border-radius: 12px;
-    padding: 10px 10px 8px; margin-bottom: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,.35);
-  }
-
-  .res-header {
-    display: flex; align-items: center; gap: 6px;
-    margin-bottom: 8px;
-  }
-  .res-name {
-    font-size: 15px; font-weight: 800; color: #38bdf8;
-    flex: 0 0 auto;
-  }
-  .goal-lbl { font-size: 11px; color: #94a3b8; }
-  .goal-lbl b { color: #facc15; }
-  .goal-inp {
-    width: 46px;
-    background: #0f172a; border: 1px solid #334155;
-    color: #fff; font-size: 14px;
-    padding: 4px 4px; border-radius: 8px;
-    font-weight: 700; text-align: center;
-    -moz-appearance: textfield;
-  }
-  .goal-inp::-webkit-outer-spin-button,
-  .goal-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .goal-hint { font-size: 10px; color: #94a3b8; margin-left: auto; }
-  .goal-hint b { color: #facc15; }
-
-  .res-progress {
-    height: 16px; background: #0f172a; border-radius: 8px;
-    overflow: hidden; position: relative; margin-bottom: 8px;
-  }
-  .res-bar {
-    height: 100%; background: linear-gradient(90deg,#22c55e,#16a34a);
-    width: 0%; transition: width .3s;
-  }
-  .res-prog-txt {
-    position: absolute; inset: 0; display: flex;
-    align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 700; color: #fff;
-    text-shadow: 0 1px 2px rgba(0,0,0,.8);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .box-row {
-    display: flex; align-items: center; gap: 4px;
-    padding: 4px 0; border-bottom: 1px solid #334155;
-  }
-  .box-row:last-child { border-bottom: none; }
-  .bname { font-size: 13px; font-weight: 600; flex: 0 0 auto; }
-  .bmult { font-size: 10px; color: #64748b; margin-left: 2px; flex: 1; }
-
-  .mini {
-    width: 30px; height: 30px; padding: 0; border-radius: 7px;
-    font-size: 17px; font-weight: 700; color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-family: inherit; cursor: pointer; border: none;
-    transition: transform .08s;
-  }
-  .mini:active { transform: scale(.9); }
-  .minus { background: #ef4444; }
-  .plus  { background: #22c55e; }
-  .bqty {
-    min-width: 26px; text-align: center;
-    font-size: 14px; font-weight: 700; color: #fff;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .res-footer {
-    display: flex; justify-content: space-between;
-    font-size: 11px; color: #94a3b8;
-    margin-top: 6px; padding-top: 6px;
-    border-top: 1px solid #334155;
-  }
-  .res-footer b { color: #facc15; font-weight: 700; }
-
-  .timer-mini {
-    display: flex; align-items: center; gap: 5px;
-    margin-top: 6px;
-  }
-  .timer-btn {
-    width: 32px; height: 26px; padding: 0; border-radius: 7px;
-    font-size: 13px; font-weight: 700; color: #fff;
-    background: #22c55e; border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-family: inherit;
-  }
-  .timer-btn.stop { background: #f59e0b; }
-  .timer-btn.reset { background: #475569; }
-  .timer-txt {
-    flex: 1; font-size: 12px; font-weight: 700; color: #38bdf8;
-    text-align: center; font-variant-numeric: tabular-nums;
-  }
-  .timer-prod {
-    font-size: 11px; color: #22c55e; font-weight: 700;
-    min-width: 44px; text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" content="#0f172a">
+  <title>Licznik Skrzyń</title>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 8px;
+      overflow-x: hidden;
+    }
+    h1 {
+      font-size: 15px;
+      text-align: center;
+      margin: 4px 0 10px;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 8px;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.3);
+    }
+    .card h2 {
+      font-size: 11px;
+      margin: 0 0 8px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+    .box-grid {
+      display: grid;
+      grid-template-columns: 46px repeat(4, 1fr);
+      gap: 3px 2px;
+      align-items: center;
+    }
+    .box-hdr {
+      font-size: 10px;
+      font-weight: 800;
+      text-align: center;
+      padding: 4px 0;
+      color: #38bdf8;
+      background: #0f172a;
+      border-radius: 6px;
+    }
+    .box-lbl {
+      font-size: 9px;
+      font-weight: 600;
+      color: #94a3b8;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .box-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f172a;
+      border-radius: 6px;
+      padding: 2px 0;
+    }
+    .mini {
+      width: 22px;
+      height: 26px;
+      padding: 0;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      transition: transform .08s;
+    }
+    .mini:active { transform: scale(.9); }
+    .minus { background: #ef4444; }
+    .plus { background: #22c55e; }
+    .bqty {
+      min-width: 22px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      padding: 0 1px;
+    }
+    .goal-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+    }
+    .goal-col { text-align: center; }
+    .goal-name {
+      font-size: 10px;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 3px;
+    }
+    .goal-inp {
+      width: 100%;
+      padding: 5px 2px;
+      font-size: 14px;
+      font-weight: 800;
+      text-align: center;
+      background: #0f172a;
+      color: #facc15;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      font-family: inherit;
+      -moz-appearance: textfield;
+    }
+    .goal-inp::-webkit-outer-spin-button,
+    .goal-inp::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .goal-bar-wrap {
+      height: 12px;
+      background: #0f172a;
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+      margin-top: 4px;
+    }
+    .goal-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+      width: 0%;
+      transition: width .3s;
+    }
+    .goal-bar.complete {
+      background: linear-gradient(90deg, #16a34a, #059669);
+    }
+    .goal-pct {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,.9);
+    }
+    .goal-info {
+      font-size: 8px;
+      color: #94a3b8;
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+    .timers { display: flex; flex-direction: column; gap: 4px; }
+    .timer-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 0;
+      border-bottom: 1px solid #334155;
+    }
+    .timer-row:last-child { border-bottom: none; }
+    .timer-name {
+      font-size: 10px;
+      font-weight: 800;
+      color: #38bdf8;
+      width: 42px;
+    }
+    .timer-btn {
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      background: #22c55e;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .timer-btn.stop { background: #f59e0b; }
+    .timer-btn.reset { background: #475569; }
+    .timer-txt {
+      flex: 1;
+      font-size: 11px;
+      font-weight: 800;
+      color: #38bdf8;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-left {
+      font-size: 9px;
+      color: #94a3b8;
+      text-align: right;
+      min-width: 60px;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-left b { color: #facc15; }
+  </style>
 </head>
 <body>
 
 <h1>📦 LICZNIK SKRZYŃ</h1>
-<div id="resources"></div>
+
+<div class="card">
+  <h2>Skrzynie</h2>
+  <div class="box-grid" id="boxGrid"></div>
+</div>
+
+<div class="card">
+  <h2>Cel (złote)</h2>
+  <div class="goal-grid" id="goalGrid"></div>
+</div>
+
+<div class="card">
+  <h2>Timery</h2>
+  <div class="timers" id="timersList"></div>
+</div>
 
 <script>
 const RESOURCES = [
@@ -142,48 +247,29 @@ const BASE_BOXES = 15;
 const BOX_TIME_HOURS = BASE_HOURS / BASE_BOXES;
 const GOLDEN_MULT = 256;
 
-function emptyCounts() {
-  return { szara:0, zielona:0, niebieska:0, fioletowa:0, zlota:0 };
-}
-function emptyRes() {
-  return { counts: emptyCounts(), goal: 1, timerStart: null };
-}
+function emptyCounts() { return {szara:0,zielona:0,niebieska:0,fioletowa:0,zlota:0}; }
+function emptyRes() { return {counts: emptyCounts(), goal: 1, timerStart: null}; }
 
 function load() {
   try { return JSON.parse(localStorage.getItem('skrzynie')); } catch(e){ return null; }
 }
-function save() {
-  localStorage.setItem('skrzynie', JSON.stringify(state));
-}
+function save() { localStorage.setItem('skrzynie', JSON.stringify(state)); }
 
 let state = load();
-
 if (!state || state.version !== 4) {
-  if (state && state.version === 3) {
-    state.version = 4;
-    delete state.activeRes;
-    save();
-  } else if (state && state.counts) {
-    state = {
-      version: 4,
-      data: {
-        skora: { counts: state.counts, goal: state.goal || 1, timerStart: state.timerStart || null },
-        ruda:  emptyRes(),
-        kosci: emptyRes(),
-        heban: emptyRes()
-      }
-    };
-    save();
-  } else {
-    state = {
-      version: 4,
-      data: {
-        skora: emptyRes(), ruda: emptyRes(),
-        kosci: emptyRes(), heban: emptyRes()
-      }
-    };
-    save();
-  }
+  const oldCounts = state && state.counts ? state.counts : null;
+  const oldGoal = state && typeof state.goal === 'number' ? state.goal : 1;
+  const oldTimer = state && state.timerStart ? state.timerStart : null;
+  state = {
+    version: 4,
+    data: {
+      skora: { counts: oldCounts || emptyCounts(), goal: oldGoal, timerStart: oldTimer },
+      ruda: emptyRes(),
+      kosci: emptyRes(),
+      heban: emptyRes()
+    }
+  };
+  save();
 }
 
 function fmtDHM(hours) {
@@ -191,166 +277,180 @@ function fmtDHM(hours) {
   const d = Math.floor(totalMin / 1440);
   const h = Math.floor((totalMin % 1440) / 60);
   const m = totalMin % 60;
-  return d + 'd ' + h + 'h ' + m + 'm';
+  if (d > 0) return d + 'd ' + h + 'h ' + m + 'm';
+  if (h > 0) return h + 'h ' + m + 'm';
+  return m + 'm';
 }
 
-function buildCard(res) {
-  const data = state.data[res.key];
-  const c = data.counts;
+function totalGrey(res) {
+  const c = state.data[res].counts;
+  let sum = 0;
+  TYPES.forEach(t => sum += c[t.key] * t.mult);
+  return sum;
+}
 
-  const card = document.createElement('div');
-  card.className = 'res-card';
-  card.dataset.card = res.key;
-
-  card.innerHTML = `
-    <div class="res-header">
-      <span class="res-name">${res.name}</span>
-      <span class="goal-lbl">Cel:</span>
-      <input type="number" class="goal-inp" value="${data.goal}" min="0" step="1" inputmode="numeric" data-res="${res.key}">
-      <span class="goal-hint">= <b class="goal-grey">0</b> sz.</span>
-    </div>
-    <div class="res-progress">
-      <div class="res-bar"></div>
-      <span class="res-prog-txt"></span>
-    </div>
-    <div class="box-rows"></div>
-    <div class="res-footer">
-      <span class="footer-left"></span>
-      <span class="footer-right"></span>
-    </div>
-    <div class="timer-mini">
-      <button class="timer-btn" data-timer-start="${res.key}">▶</button>
-      <button class="timer-btn reset" data-timer-reset="${res.key}">↺</button>
-      <span class="timer-txt" data-timer-txt="${res.key}">00:00:00</span>
-      <span class="timer-prod" data-timer-prod="${res.key}"></span>
-    </div>
-  `;
-
-  const rows = card.querySelector('.box-rows');
+function buildSkrzynie() {
+  const el = document.getElementById('boxGrid');
+  let html = '<div></div>';
+  RESOURCES.forEach(r => {
+    html += `<div class="box-hdr">${r.name}</div>`;
+  });
   TYPES.forEach(t => {
-    const row = document.createElement('div');
-    row.className = 'box-row';
-    row.innerHTML = `
-      <span class="bname">${t.name}</span>
-      <span class="bmult">·${t.mult}</span>
-      <button class="mini minus" data-res="${res.key}" data-type="${t.key}" data-d="-1">−</button>
-      <span class="bqty" data-qty="${t.key}">${c[t.key]}</span>
-      <button class="mini plus" data-res="${res.key}" data-type="${t.key}" data-d="1">+</button>
-    `;
-    rows.appendChild(row);
+    html += `<div class="box-lbl">${t.name}</div>`;
+    RESOURCES.forEach(r => {
+      html += `<div class="box-cell">
+        <button class="mini minus" data-res="${r.key}" data-type="${t.key}" data-d="-1">−</button>
+        <span class="bqty" data-qty="${r.key}-${t.key}">0</span>
+        <button class="mini plus" data-res="${r.key}" data-type="${t.key}" data-d="1">+</button>
+      </div>`;
+    });
   });
-
-  return card;
+  el.innerHTML = html;
 }
 
-function renderAll() {
-  const container = document.getElementById('resources');
-  container.innerHTML = '';
-  RESOURCES.forEach(res => {
-    container.appendChild(buildCard(res));
-    updateCardProgress(res.key);
+function buildGoals() {
+  const el = document.getElementById('goalGrid');
+  let html = '';
+  RESOURCES.forEach(r => {
+    html += `<div class="goal-col">
+      <div class="goal-name">${r.name}</div>
+      <input class="goal-inp" type="number" min="0" step="1" inputmode="numeric" data-goal="${r.key}" value="${state.data[r.key].goal}">
+      <div class="goal-bar-wrap">
+        <div class="goal-bar" data-goalbar="${r.key}"></div>
+        <span class="goal-pct" data-goalpct="${r.key}">0%</span>
+      </div>
+      <div class="goal-info" data-goalinfo="${r.key}">0/256</div>
+      <div class="goal-info" data-goaltime="${r.key}"></div>
+    </div>`;
   });
-  tickTimers();
+  el.innerHTML = html;
 }
 
-function updateCardProgress(resKey) {
-  const card = document.querySelector(`[data-card="${resKey}"]`);
-  if (!card) return;
+function buildTimers() {
+  const el = document.getElementById('timersList');
+  let html = '';
+  RESOURCES.forEach(r => {
+    html += `<div class="timer-row">
+      <span class="timer-name">${r.name}</span>
+      <button class="timer-btn" data-tstart="${r.key}">▶</button>
+      <button class="timer-btn reset" data-treset="${r.key}">↺</button>
+      <span class="timer-txt" data-ttime="${r.key}">00:00:00</span>
+      <span class="timer-left" data-tleft="${r.key}"></span>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+function refreshCounts() {
+  RESOURCES.forEach(r => {
+    const c = state.data[r.key].counts;
+    TYPES.forEach(t => {
+      const el = document.querySelector(`[data-qty="${r.key}-${t.key}"]`);
+      if (el) el.textContent = c[t.key];
+    });
+  });
+}
+
+function refreshGoal(resKey) {
   const data = state.data[resKey];
-  const c = data.counts;
+  const total = totalGrey(resKey);
+  const goalGrey = data.goal * GOLDEN_MULT;
+  const pct = goalGrey > 0 ? Math.min(100, (total/goalGrey)*100) : 0;
+  const left = Math.max(0, goalGrey - total);
+  const isComplete = pct >= 100;
 
-  let totalS = 0;
-  TYPES.forEach(t => totalS += c[t.key] * t.mult);
+  const bar = document.querySelector(`[data-goalbar="${resKey}"]`);
+  const pctEl = document.querySelector(`[data-goalpct="${resKey}"]`);
+  const infoEl = document.querySelector(`[data-goalinfo="${resKey}"]`);
+  const timeEl = document.querySelector(`[data-goaltime="${resKey}"]`);
 
-  const goalGrey = (data.goal || 0) * GOLDEN_MULT;
-  const pct = goalGrey > 0 ? Math.min(100, (totalS/goalGrey)*100) : 0;
-  const leftHours = Math.max(0, goalGrey - totalS) * BOX_TIME_HOURS;
-  const prodHours = totalS * BOX_TIME_HOURS;
-
-  card.querySelector('.res-bar').style.width = pct + '%';
-  card.querySelector('.res-prog-txt').textContent =
-    `${pct.toFixed(0)}% · ${totalS}/${goalGrey} sz.`;
-  card.querySelector('.goal-grey').textContent = goalGrey;
-  card.querySelector('.footer-left').innerHTML =
-    `Zostało: <b>${fmtDHM(leftHours)}</b>`;
-  card.querySelector('.footer-right').innerHTML =
-    `Prod.: <b>${fmtDHM(prodHours)}</b>`;
-
-  TYPES.forEach(t => {
-    const q = card.querySelector(`[data-qty="${t.key}"]`);
-    if (q) q.textContent = c[t.key];
-  });
+  if (bar) {
+    bar.style.width = pct + '%';
+    bar.classList.toggle('complete', isComplete);
+  }
+  if (pctEl) pctEl.textContent = pct.toFixed(0) + '%';
+  if (infoEl) infoEl.textContent = total + '/' + goalGrey;
+  if (timeEl) {
+    timeEl.textContent = isComplete ? '✓ gotowe' : '⏳ ' + fmtDHM(left * BOX_TIME_HOURS);
+    timeEl.style.color = isComplete ? '#22c55e' : '#94a3b8';
+  }
 }
 
-function tickTimers() {
-  RESOURCES.forEach(res => {
-    const data = state.data[res.key];
-    const txt = document.querySelector(`[data-timer-txt="${res.key}"]`);
-    const prod = document.querySelector(`[data-timer-prod="${res.key}"]`);
-    const btn = document.querySelector(`[data-timer-start="${res.key}"]`);
-    if (!txt || !prod) return;
+function refreshTimers() {
+  RESOURCES.forEach(r => {
+    const data = state.data[r.key];
+    const timeEl = document.querySelector(`[data-ttime="${r.key}"]`);
+    const leftEl = document.querySelector(`[data-tleft="${r.key}"]`);
+    const btn = document.querySelector(`[data-tstart="${r.key}"]`);
+    if (!timeEl) return;
+
+    const total = totalGrey(r.key);
+    const goalGrey = data.goal * GOLDEN_MULT;
+    const left = Math.max(0, goalGrey - total);
+    if (leftEl) leftEl.innerHTML = `<b>${fmtDHM(left * BOX_TIME_HOURS)}</b>`;
 
     if (!data.timerStart) {
-      txt.textContent = '00:00:00';
-      prod.textContent = '';
+      timeEl.textContent = '00:00:00';
       if (btn) { btn.textContent = '▶'; btn.classList.remove('stop'); }
       return;
     }
-
     const diffMs = Date.now() - data.timerStart;
     const totalSec = Math.floor(diffMs / 1000);
     const d = Math.floor(totalSec / 86400);
     const hh = String(Math.floor((totalSec % 86400) / 3600)).padStart(2,'0');
     const mm = String(Math.floor((totalSec % 3600) / 60)).padStart(2,'0');
     const ss = String(totalSec % 60).padStart(2,'0');
-    const prefix = d > 0 ? d + 'd ' : '';
-    txt.textContent = `${prefix}${hh}:${mm}:${ss}`;
-
-    const produced = Math.floor((diffMs / 3600000) / BOX_TIME_HOURS);
-    prod.textContent = `${produced} szt`;
-
+    timeEl.textContent = (d > 0 ? d + 'd ' : '') + `${hh}:${mm}:${ss}`;
     if (btn) { btn.textContent = '⏸'; btn.classList.add('stop'); }
   });
 }
 
-document.getElementById('resources').addEventListener('input', e => {
-  if (e.target.classList.contains('goal-inp')) {
-    const resKey = e.target.dataset.res;
-    state.data[resKey].goal = Math.max(0, parseInt(e.target.value) || 0);
-    save();
-    updateCardProgress(resKey);
-  }
+document.getElementById('boxGrid').addEventListener('click', e => {
+  const btn = e.target.closest('button.mini');
+  if (!btn) return;
+  const { res, type, d } = btn.dataset;
+  state.data[res].counts[type] = Math.max(0, state.data[res].counts[type] + parseInt(d));
+  save();
+  refreshCounts();
+  refreshGoal(res);
+  refreshTimers();
 });
 
-document.getElementById('resources').addEventListener('click', e => {
+document.getElementById('goalGrid').addEventListener('input', e => {
+  const inp = e.target.closest('.goal-inp');
+  if (!inp) return;
+  const res = inp.dataset.goal;
+  state.data[res].goal = Math.max(0, parseInt(inp.value) || 0);
+  save();
+  refreshGoal(res);
+  refreshTimers();
+});
+
+document.getElementById('timersList').addEventListener('click', e => {
   const btn = e.target.closest('button');
   if (!btn) return;
-
-  if (btn.classList.contains('mini')) {
-    const resKey = btn.dataset.res;
-    const typeKey = btn.dataset.type;
-    const delta = parseInt(btn.dataset.d);
-    const data = state.data[resKey];
-    data.counts[typeKey] = Math.max(0, data.counts[typeKey] + delta);
-    save();
-    updateCardProgress(resKey);
-  } else if (btn.dataset.timerStart) {
-    const resKey = btn.dataset.timerStart;
-    const data = state.data[resKey];
+  if (btn.dataset.tstart) {
+    const res = btn.dataset.tstart;
+    const data = state.data[res];
     if (data.timerStart) data.timerStart = null;
     else data.timerStart = Date.now();
     save();
-    tickTimers();
-  } else if (btn.dataset.timerReset) {
-    const resKey = btn.dataset.timerReset;
-    state.data[resKey].timerStart = null;
+    refreshTimers();
+  } else if (btn.dataset.treset) {
+    state.data[btn.dataset.treset].timerStart = null;
     save();
-    tickTimers();
+    refreshTimers();
   }
 });
 
-renderAll();
-setInterval(tickTimers, 1000);
+buildSkrzynie();
+buildGoals();
+buildTimers();
+refreshCounts();
+RESOURCES.forEach(r => refreshGoal(r.key));
+refreshTimers();
+
+setInterval(refreshTimers, 1000);
 </script>
 </body>
 </html>
