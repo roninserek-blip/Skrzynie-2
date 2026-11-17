@@ -9,183 +9,117 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
     margin: 0; font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: #0f172a; color: #e2e8f0; padding: 12px;
-    padding-bottom: 80px;
+    background: #0f172a; color: #e2e8f0; padding: 10px;
+    padding-bottom: 24px;
   }
-  h1 { font-size: 18px; text-align: center; margin: 4px 0 12px;
+  h1 { font-size: 17px; text-align: center; margin: 4px 0 12px;
        color: #fff; letter-spacing: 1px; }
-  .tabs {
-    display: flex; gap: 6px; margin-bottom: 12px;
-    background: #1e293b; padding: 6px;
-    border-radius: 14px;
+
+  .res-card {
+    background: #1e293b; border-radius: 12px;
+    padding: 10px 10px 8px; margin-bottom: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.35);
   }
-  .tab {
-    flex: 1; padding: 10px 4px; border-radius: 10px;
-    background: transparent; color: #94a3b8;
-    font-size: 13px; font-weight: 700;
-    width: auto; height: auto;
-    transition: background .2s, color .2s;
+
+  .res-header {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 8px;
   }
-  .tab.active { background: #2563eb; color: #fff; }
-  .card {
-    background: #1e293b; border-radius: 14px; padding: 12px;
-    margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.35);
+  .res-name {
+    font-size: 15px; font-weight: 800; color: #38bdf8;
+    flex: 0 0 auto;
   }
-  .card h2 {
-    font-size: 13px; margin: 0 0 10px; text-transform: uppercase;
-    color: #94a3b8; letter-spacing: 1px;
+  .goal-lbl { font-size: 11px; color: #94a3b8; }
+  .goal-lbl b { color: #facc15; }
+  .goal-inp {
+    width: 46px;
+    background: #0f172a; border: 1px solid #334155;
+    color: #fff; font-size: 14px;
+    padding: 4px 4px; border-radius: 8px;
+    font-weight: 700; text-align: center;
+    -moz-appearance: textfield;
   }
-  .row {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 0; border-bottom: 1px solid #334155;
+  .goal-inp::-webkit-outer-spin-button,
+  .goal-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .goal-hint { font-size: 10px; color: #94a3b8; margin-left: auto; }
+  .goal-hint b { color: #facc15; }
+
+  .res-progress {
+    height: 16px; background: #0f172a; border-radius: 8px;
+    overflow: hidden; position: relative; margin-bottom: 8px;
   }
-  .row:last-child { border-bottom: none; }
-  .name { flex: 1; font-weight: 600; font-size: 15px; }
-  .name small { display: block; color: #64748b; font-weight: 400;
-    font-size: 11px; }
-  .btns { display: flex; align-items: center; gap: 6px; }
-  button {
-    font-family: inherit; cursor: pointer; border: none;
-    border-radius: 10px; font-weight: 700; color: #fff;
-    font-size: 20px; width: 42px; height: 42px;
-    display: flex; align-items: center; justify-content: center;
-    transition: transform .08s, background .15s;
-  }
-  button:active { transform: scale(.92); }
-  .minus { background: #ef4444; }
-  .plus  { background: #22c55e; }
-  .qty {
-    min-width: 46px; text-align: center; font-size: 18px;
-    font-weight: 700; color: #fff;
-  }
-  .big {
-    font-size: 22px; font-weight: 800; color: #38bdf8;
-    text-align: center; padding: 4px 0;
-  }
-  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .stat {
-    background: #0f172a; border-radius: 10px; padding: 10px;
-    text-align: center;
-  }
-  .stat .lbl { font-size: 11px; color: #94a3b8; text-transform: uppercase;
-    letter-spacing: .5px; margin-bottom: 4px; }
-  .stat .val { font-size: 16px; font-weight: 800; color: #fff; }
-  .stat .val.y { color: #facc15; }
-  .progress-wrap {
-    background: #0f172a; border-radius: 10px; height: 26px;
-    overflow: hidden; position: relative; margin-top: 10px;
-  }
-  .progress-bar {
+  .res-bar {
     height: 100%; background: linear-gradient(90deg,#22c55e,#16a34a);
-    width: 0%; transition: width .3s; border-radius: 10px;
+    width: 0%; transition: width .3s;
   }
-  .progress-text {
+  .res-prog-txt {
     position: absolute; inset: 0; display: flex;
     align-items: center; justify-content: center;
-    font-weight: 700; font-size: 13px; color: #fff;
-    text-shadow: 0 1px 2px rgba(0,0,0,.6);
-  }
-  .conv-row {
-    display: flex; justify-content: space-between;
-    padding: 6px 0; border-bottom: 1px solid #334155;
-    font-size: 15px;
-  }
-  .conv-row:last-child { border-bottom: none; }
-  .conv-row b { color: #facc15; font-size: 17px; }
-  .goal-input {
-    display: flex; gap: 8px; align-items: center;
-    margin-top: 8px;
-  }
-  .goal-input input {
-    flex: 1; background: #0f172a; border: 1px solid #334155;
-    color: #fff; font-size: 18px; padding: 10px; border-radius: 10px;
-    font-weight: 700; text-align: center;
-  }
-  .goal-hint {
-    text-align: center; font-size: 12px; color: #94a3b8;
-    margin-top: 4px;
-  }
-  .goal-hint b { color: #facc15; }
-  .timer-row { display: flex; gap: 8px; margin-top: 6px; }
-  .timer-row button {
-    flex: 1; width: auto; height: 50px; font-size: 15px;
-  }
-  .btn-start { background: #22c55e; }
-  .btn-reset { background: #64748b; }
-  .timer-time {
-    text-align: center; font-size: 26px; font-weight: 800;
-    color: #38bdf8; letter-spacing: 2px; padding: 8px 0;
+    font-size: 10px; font-weight: 700; color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,.8);
     font-variant-numeric: tabular-nums;
   }
-  .timer-info {
-    text-align: center; color: #94a3b8; font-size: 13px;
-    margin-top: 4px;
+
+  .box-row {
+    display: flex; align-items: center; gap: 4px;
+    padding: 4px 0; border-bottom: 1px solid #334155;
   }
-  .reset-all {
-    width: 100%; height: 46px; background: #dc2626;
-    font-size: 14px; margin-top: 8px; border-radius: 10px;
+  .box-row:last-child { border-bottom: none; }
+  .bname { font-size: 13px; font-weight: 600; flex: 0 0 auto; }
+  .bmult { font-size: 10px; color: #64748b; margin-left: 2px; flex: 1; }
+
+  .mini {
+    width: 30px; height: 30px; padding: 0; border-radius: 7px;
+    font-size: 17px; font-weight: 700; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: inherit; cursor: pointer; border: none;
+    transition: transform .08s;
+  }
+  .mini:active { transform: scale(.9); }
+  .minus { background: #ef4444; }
+  .plus  { background: #22c55e; }
+  .bqty {
+    min-width: 26px; text-align: center;
+    font-size: 14px; font-weight: 700; color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .res-footer {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: #94a3b8;
+    margin-top: 6px; padding-top: 6px;
+    border-top: 1px solid #334155;
+  }
+  .res-footer b { color: #facc15; font-weight: 700; }
+
+  .timer-mini {
+    display: flex; align-items: center; gap: 5px;
+    margin-top: 6px;
+  }
+  .timer-btn {
+    width: 32px; height: 26px; padding: 0; border-radius: 7px;
+    font-size: 13px; font-weight: 700; color: #fff;
+    background: #22c55e; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-family: inherit;
+  }
+  .timer-btn.stop { background: #f59e0b; }
+  .timer-btn.reset { background: #475569; }
+  .timer-txt {
+    flex: 1; font-size: 12px; font-weight: 700; color: #38bdf8;
+    text-align: center; font-variant-numeric: tabular-nums;
+  }
+  .timer-prod {
+    font-size: 11px; color: #22c55e; font-weight: 700;
+    min-width: 44px; text-align: right;
+    font-variant-numeric: tabular-nums;
   }
 </style>
 </head>
 <body>
 
 <h1>📦 LICZNIK SKRZYŃ</h1>
-
-<div class="tabs">
-  <button class="tab active" data-res="skora">Skóra</button>
-  <button class="tab" data-res="ruda">Ruda</button>
-  <button class="tab" data-res="kosci">Kości</button>
-  <button class="tab" data-res="heban">Heban</button>
-</div>
-
-<div class="card">
-  <h2>Postęp do celu — <span id="resLabel">Skóra</span></h2>
-  <div class="goal-input">
-    <span style="font-size:13px;color:#94a3b8">Cel (złote):</span>
-    <input type="number" id="goal" value="1" min="0" step="1" inputmode="numeric">
-  </div>
-  <div class="goal-hint">= <b id="goalGrey">256</b> szarych</div>
-  <div class="progress-wrap">
-    <div class="progress-bar" id="pbar"></div>
-    <div class="progress-text" id="ptext">0%</div>
-  </div>
-  <div class="stats" style="margin-top:10px">
-    <div class="stat"><div class="lbl">Zostało szarych</div><div class="val y" id="leftBoxes">256</div></div>
-    <div class="stat"><div class="lbl">Zostało czasu</div><div class="val y" id="leftTime">0d 0h 0m</div></div>
-  </div>
-</div>
-
-<div class="card">
-  <h2>Twoje skrzynie</h2>
-  <div id="counters"></div>
-</div>
-
-<div class="card">
-  <h2>Podsumowanie</h2>
-  <div class="big" id="totalBoxes">0 / 256 szarych</div>
-  <div class="stats" style="margin-top:10px">
-    <div class="stat"><div class="lbl">Czas prod.</div><div class="val" id="totalTime">0d 0h 0m</div></div>
-    <div class="stat"><div class="lbl">W minutach</div><div class="val" id="totalMin">0 min</div></div>
-  </div>
-</div>
-
-<div class="card">
-  <h2>Najwyższe skrzynie</h2>
-  <div id="conversion"></div>
-</div>
-
-<div class="card">
-  <h2>⏱ Timer produkcji</h2>
-  <div class="timer-time" id="timerTime">00:00:00</div>
-  <div class="timer-info" id="timerInfo">Kliknij START, aby zacząć</div>
-  <div class="timer-row">
-    <button class="btn-start" id="btnStart">▶ START</button>
-    <button class="btn-reset" id="btnReset">↺ RESET</button>
-  </div>
-  <div class="timer-info" id="timerProd" style="margin-top:8px;color:#22c55e;font-weight:700"></div>
-</div>
-
-<button class="reset-all" id="resetAll">🗑 Wyczyść Skóra</button>
+<div id="resources"></div>
 
 <script>
 const RESOURCES = [
@@ -224,27 +158,32 @@ function save() {
 
 let state = load();
 
-if (!state || state.version !== 3) {
-  const oldCounts = (state && state.counts) ? state.counts : null;
-  const oldGoal = (state && typeof state.goal === 'number') ? state.goal : 1;
-  const oldTimer = (state && state.timerStart) ? state.timerStart : null;
-  state = {
-    version: 3,
-    activeRes: 'skora',
-    data: {
-      skora: { counts: oldCounts || emptyCounts(), goal: oldGoal, timerStart: oldTimer },
-      ruda:  emptyRes(),
-      kosci: emptyRes(),
-      heban: emptyRes()
-    }
-  };
-  save();
-}
-
-function currentRes() { return state.data[state.activeRes]; }
-function currentResName() {
-  const r = RESOURCES.find(x => x.key === state.activeRes);
-  return r ? r.name : '';
+if (!state || state.version !== 4) {
+  if (state && state.version === 3) {
+    state.version = 4;
+    delete state.activeRes;
+    save();
+  } else if (state && state.counts) {
+    state = {
+      version: 4,
+      data: {
+        skora: { counts: state.counts, goal: state.goal || 1, timerStart: state.timerStart || null },
+        ruda:  emptyRes(),
+        kosci: emptyRes(),
+        heban: emptyRes()
+      }
+    };
+    save();
+  } else {
+    state = {
+      version: 4,
+      data: {
+        skora: emptyRes(), ruda: emptyRes(),
+        kosci: emptyRes(), heban: emptyRes()
+      }
+    };
+    save();
+  }
 }
 
 function fmtDHM(hours) {
@@ -255,145 +194,163 @@ function fmtDHM(hours) {
   return d + 'd ' + h + 'h ' + m + 'm';
 }
 
-function render() {
-  const data = currentRes();
+function buildCard(res) {
+  const data = state.data[res.key];
   const c = data.counts;
 
-  document.getElementById('resLabel').textContent = currentResName();
-  document.getElementById('resetAll').textContent = '🗑 Wyczyść ' + currentResName();
+  const card = document.createElement('div');
+  card.className = 'res-card';
+  card.dataset.card = res.key;
 
-  const counters = document.getElementById('counters');
-  counters.innerHTML = '';
+  card.innerHTML = `
+    <div class="res-header">
+      <span class="res-name">${res.name}</span>
+      <span class="goal-lbl">Cel:</span>
+      <input type="number" class="goal-inp" value="${data.goal}" min="0" step="1" inputmode="numeric" data-res="${res.key}">
+      <span class="goal-hint">= <b class="goal-grey">0</b> sz.</span>
+    </div>
+    <div class="res-progress">
+      <div class="res-bar"></div>
+      <span class="res-prog-txt"></span>
+    </div>
+    <div class="box-rows"></div>
+    <div class="res-footer">
+      <span class="footer-left"></span>
+      <span class="footer-right"></span>
+    </div>
+    <div class="timer-mini">
+      <button class="timer-btn" data-timer-start="${res.key}">▶</button>
+      <button class="timer-btn reset" data-timer-reset="${res.key}">↺</button>
+      <span class="timer-txt" data-timer-txt="${res.key}">00:00:00</span>
+      <span class="timer-prod" data-timer-prod="${res.key}"></span>
+    </div>
+  `;
+
+  const rows = card.querySelector('.box-rows');
   TYPES.forEach(t => {
     const row = document.createElement('div');
-    row.className = 'row';
+    row.className = 'box-row';
     row.innerHTML = `
-      <div class="name">${t.name}<small>${t.mult} szarych</small></div>
-      <div class="btns">
-        <button class="minus" data-k="${t.key}" data-d="-1">−</button>
-        <div class="qty" id="q-${t.key}">${c[t.key]}</div>
-        <button class="plus" data-k="${t.key}" data-d="1">+</button>
-      </div>`;
-    counters.appendChild(row);
+      <span class="bname">${t.name}</span>
+      <span class="bmult">·${t.mult}</span>
+      <button class="mini minus" data-res="${res.key}" data-type="${t.key}" data-d="-1">−</button>
+      <span class="bqty" data-qty="${t.key}">${c[t.key]}</span>
+      <button class="mini plus" data-res="${res.key}" data-type="${t.key}" data-d="1">+</button>
+    `;
+    rows.appendChild(row);
   });
-  counters.querySelectorAll('button').forEach(b => {
-    b.onclick = () => {
-      const k = b.dataset.k;
-      const d = parseInt(b.dataset.d);
-      const r = currentRes();
-      r.counts[k] = Math.max(0, r.counts[k] + d);
-      save(); render();
-    };
+
+  return card;
+}
+
+function renderAll() {
+  const container = document.getElementById('resources');
+  container.innerHTML = '';
+  RESOURCES.forEach(res => {
+    container.appendChild(buildCard(res));
+    updateCardProgress(res.key);
   });
+  tickTimers();
+}
+
+function updateCardProgress(resKey) {
+  const card = document.querySelector(`[data-card="${resKey}"]`);
+  if (!card) return;
+  const data = state.data[resKey];
+  const c = data.counts;
 
   let totalS = 0;
   TYPES.forEach(t => totalS += c[t.key] * t.mult);
 
-  const goalGold = data.goal || 0;
-  const goalGrey = goalGold * GOLDEN_MULT;
-
-  document.getElementById('totalBoxes').textContent =
-    totalS + ' / ' + goalGrey + ' szarych';
-  document.getElementById('goalGrey').textContent = goalGrey;
-
-  const totalHours = totalS * BOX_TIME_HOURS;
-  document.getElementById('totalTime').textContent = fmtDHM(totalHours);
-  document.getElementById('totalMin').textContent = Math.round(totalHours*60) + ' min';
-
+  const goalGrey = (data.goal || 0) * GOLDEN_MULT;
   const pct = goalGrey > 0 ? Math.min(100, (totalS/goalGrey)*100) : 0;
-  document.getElementById('pbar').style.width = pct + '%';
-  document.getElementById('ptext').textContent = pct.toFixed(0) + '%';
+  const leftHours = Math.max(0, goalGrey - totalS) * BOX_TIME_HOURS;
+  const prodHours = totalS * BOX_TIME_HOURS;
 
-  const left = Math.max(0, goalGrey - totalS);
-  document.getElementById('leftBoxes').textContent = left;
-  document.getElementById('leftTime').textContent = fmtDHM(left * BOX_TIME_HOURS);
+  card.querySelector('.res-bar').style.width = pct + '%';
+  card.querySelector('.res-prog-txt').textContent =
+    `${pct.toFixed(0)}% · ${totalS}/${goalGrey} sz.`;
+  card.querySelector('.goal-grey').textContent = goalGrey;
+  card.querySelector('.footer-left').innerHTML =
+    `Zostało: <b>${fmtDHM(leftHours)}</b>`;
+  card.querySelector('.footer-right').innerHTML =
+    `Prod.: <b>${fmtDHM(prodHours)}</b>`;
 
-  const conv = document.getElementById('conversion');
-  const vals = [
-    ['Złote',     Math.floor(totalS/256)],
-    ['Fioletowe', Math.floor((totalS%256)/64)],
-    ['Niebieskie',Math.floor((totalS%64)/16)],
-    ['Zielone',   Math.floor((totalS%16)/4)],
-    ['Szare',     totalS%4]
-  ];
-  conv.innerHTML = vals.map(v =>
-    `<div class="conv-row"><span>${v[0]}</span><b>${v[1]}</b></div>`
-  ).join('');
+  TYPES.forEach(t => {
+    const q = card.querySelector(`[data-qty="${t.key}"]`);
+    if (q) q.textContent = c[t.key];
+  });
 }
 
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.onclick = () => {
-    state.activeRes = tab.dataset.res;
+function tickTimers() {
+  RESOURCES.forEach(res => {
+    const data = state.data[res.key];
+    const txt = document.querySelector(`[data-timer-txt="${res.key}"]`);
+    const prod = document.querySelector(`[data-timer-prod="${res.key}"]`);
+    const btn = document.querySelector(`[data-timer-start="${res.key}"]`);
+    if (!txt || !prod) return;
+
+    if (!data.timerStart) {
+      txt.textContent = '00:00:00';
+      prod.textContent = '';
+      if (btn) { btn.textContent = '▶'; btn.classList.remove('stop'); }
+      return;
+    }
+
+    const diffMs = Date.now() - data.timerStart;
+    const totalSec = Math.floor(diffMs / 1000);
+    const d = Math.floor(totalSec / 86400);
+    const hh = String(Math.floor((totalSec % 86400) / 3600)).padStart(2,'0');
+    const mm = String(Math.floor((totalSec % 3600) / 60)).padStart(2,'0');
+    const ss = String(totalSec % 60).padStart(2,'0');
+    const prefix = d > 0 ? d + 'd ' : '';
+    txt.textContent = `${prefix}${hh}:${mm}:${ss}`;
+
+    const produced = Math.floor((diffMs / 3600000) / BOX_TIME_HOURS);
+    prod.textContent = `${produced} szt`;
+
+    if (btn) { btn.textContent = '⏸'; btn.classList.add('stop'); }
+  });
+}
+
+document.getElementById('resources').addEventListener('input', e => {
+  if (e.target.classList.contains('goal-inp')) {
+    const resKey = e.target.dataset.res;
+    state.data[resKey].goal = Math.max(0, parseInt(e.target.value) || 0);
     save();
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('goal').value = currentRes().goal;
-    render();
-    tickTimer();
-  };
-});
-
-document.getElementById('goal').addEventListener('input', e => {
-  currentRes().goal = Math.max(0, parseInt(e.target.value) || 0);
-  save(); render();
-});
-
-document.getElementById('resetAll').onclick = () => {
-  if (!confirm('Wyczyścić skrzynie dla "' + currentResName() + '"?')) return;
-  currentRes().counts = emptyCounts();
-  save(); render();
-};
-
-function tickTimer() {
-  const data = currentRes();
-  const btnStart = document.getElementById('btnStart');
-  
-  if (!data.timerStart) {
-    document.getElementById('timerTime').textContent = '00:00:00';
-    document.getElementById('timerInfo').textContent = 'Kliknij START, aby zacząć';
-    document.getElementById('timerProd').textContent = '';
-    btnStart.textContent = '▶ START';
-    return;
+    updateCardProgress(resKey);
   }
-  
-  const diffMs = Date.now() - data.timerStart;
-  const totalSec = Math.floor(diffMs / 1000);
-  const d = Math.floor(totalSec / 86400);
-  const hh = String(Math.floor((totalSec % 86400) / 3600)).padStart(2,'0');
-  const mm = String(Math.floor((totalSec % 3600) / 60)).padStart(2,'0');
-  const ss = String(totalSec % 60).padStart(2,'0');
-  const prefix = d > 0 ? d + 'd ' : '';
-  document.getElementById('timerTime').textContent = `${prefix}${hh}:${mm}:${ss}`;
-  document.getElementById('timerInfo').textContent = 'Produkcja w toku…';
-  btnStart.textContent = '⏸ STOP';
+});
 
-  const hours = diffMs / 3600000;
-  const produced = Math.floor(hours / BOX_TIME_HOURS);
-  document.getElementById('timerProd').textContent =
-    `Wyprodukowano: ${produced} szarych skrzyń`;
-}
+document.getElementById('resources').addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
 
-document.getElementById('btnStart').onclick = () => {
-  const data = currentRes();
-  if (data.timerStart) data.timerStart = null;
-  else data.timerStart = Date.now();
-  save();
-  tickTimer();
-};
+  if (btn.classList.contains('mini')) {
+    const resKey = btn.dataset.res;
+    const typeKey = btn.dataset.type;
+    const delta = parseInt(btn.dataset.d);
+    const data = state.data[resKey];
+    data.counts[typeKey] = Math.max(0, data.counts[typeKey] + delta);
+    save();
+    updateCardProgress(resKey);
+  } else if (btn.dataset.timerStart) {
+    const resKey = btn.dataset.timerStart;
+    const data = state.data[resKey];
+    if (data.timerStart) data.timerStart = null;
+    else data.timerStart = Date.now();
+    save();
+    tickTimers();
+  } else if (btn.dataset.timerReset) {
+    const resKey = btn.dataset.timerReset;
+    state.data[resKey].timerStart = null;
+    save();
+    tickTimers();
+  }
+});
 
-document.getElementById('btnReset').onclick = () => {
-  currentRes().timerStart = null;
-  save();
-  tickTimer();
-};
-
-document.querySelectorAll('.tab').forEach(t =>
-  t.classList.toggle('active', t.dataset.res === state.activeRes)
-);
-document.getElementById('goal').value = currentRes().goal;
-setInterval(tickTimer, 1000);
-tickTimer();
-render();
+renderAll();
+setInterval(tickTimers, 1000);
 </script>
 </body>
 </html>
