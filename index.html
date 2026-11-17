@@ -56,7 +56,7 @@
   }
   .stat .lbl { font-size: 11px; color: #94a3b8; text-transform: uppercase;
     letter-spacing: .5px; margin-bottom: 4px; }
-  .stat .val { font-size: 18px; font-weight: 800; color: #fff; }
+  .stat .val { font-size: 16px; font-weight: 800; color: #fff; }
   .stat .val.g { color: #22c55e; }
   .stat .val.y { color: #facc15; }
   .stat .val.b { color: #38bdf8; }
@@ -102,7 +102,7 @@
   .btn-start { background: #22c55e; }
   .btn-reset { background: #64748b; }
   .timer-time {
-    text-align: center; font-size: 30px; font-weight: 800;
+    text-align: center; font-size: 26px; font-weight: 800;
     color: #38bdf8; letter-spacing: 2px; padding: 8px 0;
     font-variant-numeric: tabular-nums;
   }
@@ -121,20 +121,6 @@
 <h1>📦 LICZNIK SKRZYŃ</h1>
 
 <div class="card">
-  <h2>Twoje skrzynie</h2>
-  <div id="counters"></div>
-</div>
-
-<div class="card">
-  <h2>Podsumowanie</h2>
-  <div class="big" id="totalBoxes">0 / 256 szarych</div>
-  <div class="stats" style="margin-top:10px">
-    <div class="stat"><div class="lbl">Czas prod.</div><div class="val" id="totalTime">0:00</div></div>
-    <div class="stat"><div class="lbl">W minutach</div><div class="val" id="totalMin">0 min</div></div>
-  </div>
-</div>
-
-<div class="card">
   <h2>Postęp do celu</h2>
   <div class="goal-input">
     <span style="font-size:13px;color:#94a3b8">Cel (złote):</span>
@@ -147,7 +133,21 @@
   </div>
   <div class="stats" style="margin-top:10px">
     <div class="stat"><div class="lbl">Zostało szarych</div><div class="val y" id="leftBoxes">256</div></div>
-    <div class="stat"><div class="lbl">Zostało czasu</div><div class="val y" id="leftTime">51:12</div></div>
+    <div class="stat"><div class="lbl">Zostało czasu</div><div class="val y" id="leftTime">0d 0h 0m</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Twoje skrzynie</h2>
+  <div id="counters"></div>
+</div>
+
+<div class="card">
+  <h2>Podsumowanie</h2>
+  <div class="big" id="totalBoxes">0 / 256 szarych</div>
+  <div class="stats" style="margin-top:10px">
+    <div class="stat"><div class="lbl">Czas prod.</div><div class="val" id="totalTime">0d 0h 0m</div></div>
+    <div class="stat"><div class="lbl">W minutach</div><div class="val" id="totalMin">0 min</div></div>
   </div>
 </div>
 
@@ -189,7 +189,6 @@ let state = load() || {
   timerStart: null
 };
 
-// migracja: stary cel był w szarych (domyślnie 256), nowy w złotych (domyślnie 1)
 if (state.goalVersion !== 2) {
   state.goal = 1;
   state.goalVersion = 2;
@@ -203,17 +202,18 @@ function save() {
   localStorage.setItem('skrzynie', JSON.stringify(state));
 }
 
-function fmtHM(hours) {
+// "Xd Yh Zm"
+function fmtDHM(hours) {
   const totalMin = Math.round(hours * 60);
-  const h = Math.floor(totalMin / 60);
+  const d = Math.floor(totalMin / 1440);
+  const h = Math.floor((totalMin % 1440) / 60);
   const m = totalMin % 60;
-  return h + ':' + String(m).padStart(2,'0');
+  return d + 'd ' + h + 'h ' + m + 'm';
 }
 
 function render() {
   const c = state.counts;
 
-  // liczniki
   const counters = document.getElementById('counters');
   counters.innerHTML = '';
   TYPES.forEach(t => {
@@ -237,11 +237,9 @@ function render() {
     };
   });
 
-  // suma szarych
   let totalS = 0;
   TYPES.forEach(t => totalS += c[t.key] * t.mult);
 
-  // cel w złotych -> szare
   const goalGold = state.goal || 0;
   const goalGrey = goalGold * GOLDEN_MULT;
 
@@ -250,19 +248,17 @@ function render() {
   document.getElementById('goalGrey').textContent = goalGrey;
 
   const totalHours = totalS * BOX_TIME_HOURS;
-  document.getElementById('totalTime').textContent = fmtHM(totalHours);
+  document.getElementById('totalTime').textContent = fmtDHM(totalHours);
   document.getElementById('totalMin').textContent = Math.round(totalHours*60) + ' min';
 
-  // postęp
   const pct = goalGrey > 0 ? Math.min(100, (totalS/goalGrey)*100) : 0;
   document.getElementById('pbar').style.width = pct + '%';
   document.getElementById('ptext').textContent = pct.toFixed(0) + '%';
 
   const left = Math.max(0, goalGrey - totalS);
   document.getElementById('leftBoxes').textContent = left;
-  document.getElementById('leftTime').textContent = fmtHM(left * BOX_TIME_HOURS);
+  document.getElementById('leftTime').textContent = fmtDHM(left * BOX_TIME_HOURS);
 
-  // przeliczenie na najwyższe
   const conv = document.getElementById('conversion');
   const vals = [
     ['Złote',    Math.floor(totalS/256)],
@@ -297,11 +293,13 @@ function tickTimer() {
     return;
   }
   const diffMs = Date.now() - state.timerStart;
-  const s = Math.floor(diffMs/1000);
-  const hh = String(Math.floor(s/3600)).padStart(2,'0');
-  const mm = String(Math.floor((s%3600)/60)).padStart(2,'0');
-  const ss = String(s%60).padStart(2,'0');
-  document.getElementById('timerTime').textContent = `${hh}:${mm}:${ss}`;
+  const totalSec = Math.floor(diffMs / 1000);
+  const d = Math.floor(totalSec / 86400);
+  const hh = String(Math.floor((totalSec % 86400) / 3600)).padStart(2,'0');
+  const mm = String(Math.floor((totalSec % 3600) / 60)).padStart(2,'0');
+  const ss = String(totalSec % 60).padStart(2,'0');
+  const prefix = d > 0 ? d + 'd ' : '';
+  document.getElementById('timerTime').textContent = `${prefix}${hh}:${mm}:${ss}`;
   document.getElementById('timerInfo').textContent = 'Produkcja w toku…';
 
   const hours = diffMs / 3600000;
