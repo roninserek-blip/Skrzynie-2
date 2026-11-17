@@ -12,8 +12,21 @@
     background: #0f172a; color: #e2e8f0; padding: 12px;
     padding-bottom: 80px;
   }
-  h1 { font-size: 20px; text-align: center; margin: 8px 0 16px;
+  h1 { font-size: 18px; text-align: center; margin: 4px 0 12px;
        color: #fff; letter-spacing: 1px; }
+  .tabs {
+    display: flex; gap: 6px; margin-bottom: 12px;
+    background: #1e293b; padding: 6px;
+    border-radius: 14px;
+  }
+  .tab {
+    flex: 1; padding: 10px 4px; border-radius: 10px;
+    background: transparent; color: #94a3b8;
+    font-size: 13px; font-weight: 700;
+    width: auto; height: auto;
+    transition: background .2s, color .2s;
+  }
+  .tab.active { background: #2563eb; color: #fff; }
   .card {
     background: #1e293b; border-radius: 14px; padding: 12px;
     margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.35);
@@ -57,9 +70,7 @@
   .stat .lbl { font-size: 11px; color: #94a3b8; text-transform: uppercase;
     letter-spacing: .5px; margin-bottom: 4px; }
   .stat .val { font-size: 16px; font-weight: 800; color: #fff; }
-  .stat .val.g { color: #22c55e; }
   .stat .val.y { color: #facc15; }
-  .stat .val.b { color: #38bdf8; }
   .progress-wrap {
     background: #0f172a; border-radius: 10px; height: 26px;
     overflow: hidden; position: relative; margin-top: 10px;
@@ -120,8 +131,15 @@
 
 <h1>📦 LICZNIK SKRZYŃ</h1>
 
+<div class="tabs">
+  <button class="tab active" data-res="skora">Skóra</button>
+  <button class="tab" data-res="ruda">Ruda</button>
+  <button class="tab" data-res="kosci">Kości</button>
+  <button class="tab" data-res="heban">Heban</button>
+</div>
+
 <div class="card">
-  <h2>Postęp do celu</h2>
+  <h2>Postęp do celu — <span id="resLabel">Skóra</span></h2>
   <div class="goal-input">
     <span style="font-size:13px;color:#94a3b8">Cel (złote):</span>
     <input type="number" id="goal" value="1" min="0" step="1" inputmode="numeric">
@@ -167,32 +185,34 @@
   <div class="timer-info" id="timerProd" style="margin-top:8px;color:#22c55e;font-weight:700"></div>
 </div>
 
-<button class="reset-all" id="resetAll">🗑 Wyczyść wszystkie skrzynie</button>
+<button class="reset-all" id="resetAll">🗑 Wyczyść Skóra</button>
 
 <script>
+const RESOURCES = [
+  { key: 'skora', name: 'Skóra' },
+  { key: 'ruda',  name: 'Ruda'  },
+  { key: 'kosci', name: 'Kości' },
+  { key: 'heban', name: 'Heban' }
+];
+
 const TYPES = [
-  { key:'szara',    name:'Szara',    mult:1,   time:1  },
-  { key:'zielona',  name:'Zielona',  mult:4,   time:4  },
-  { key:'niebieska',name:'Niebieska',mult:16,  time:16 },
-  { key:'fioletowa',name:'Fioletowa',mult:64,  time:64 },
-  { key:'zlota',    name:'Złota',    mult:256, time:256}
+  { key:'szara',    name:'Szara',    mult:1   },
+  { key:'zielona',  name:'Zielona',  mult:4   },
+  { key:'niebieska',name:'Niebieska',mult:16  },
+  { key:'fioletowa',name:'Fioletowa',mult:64  },
+  { key:'zlota',    name:'Złota',    mult:256 }
 ];
 
 const BASE_HOURS = 3;
 const BASE_BOXES = 15;
-const BOX_TIME_HOURS = BASE_HOURS / BASE_BOXES; // 0.2h = 12 min
+const BOX_TIME_HOURS = BASE_HOURS / BASE_BOXES;
 const GOLDEN_MULT = 256;
 
-let state = load() || {
-  counts: { szara:0, zielona:0, niebieska:0, fioletowa:0, zlota:0 },
-  goal: 1,
-  timerStart: null
-};
-
-if (state.goalVersion !== 2) {
-  state.goal = 1;
-  state.goalVersion = 2;
-  save();
+function emptyCounts() {
+  return { szara:0, zielona:0, niebieska:0, fioletowa:0, zlota:0 };
+}
+function emptyRes() {
+  return { counts: emptyCounts(), goal: 1, timerStart: null };
 }
 
 function load() {
@@ -202,7 +222,31 @@ function save() {
   localStorage.setItem('skrzynie', JSON.stringify(state));
 }
 
-// "Xd Yh Zm"
+let state = load();
+
+if (!state || state.version !== 3) {
+  const oldCounts = (state && state.counts) ? state.counts : null;
+  const oldGoal = (state && typeof state.goal === 'number') ? state.goal : 1;
+  const oldTimer = (state && state.timerStart) ? state.timerStart : null;
+  state = {
+    version: 3,
+    activeRes: 'skora',
+    data: {
+      skora: { counts: oldCounts || emptyCounts(), goal: oldGoal, timerStart: oldTimer },
+      ruda:  emptyRes(),
+      kosci: emptyRes(),
+      heban: emptyRes()
+    }
+  };
+  save();
+}
+
+function currentRes() { return state.data[state.activeRes]; }
+function currentResName() {
+  const r = RESOURCES.find(x => x.key === state.activeRes);
+  return r ? r.name : '';
+}
+
 function fmtDHM(hours) {
   const totalMin = Math.round(hours * 60);
   const d = Math.floor(totalMin / 1440);
@@ -212,7 +256,11 @@ function fmtDHM(hours) {
 }
 
 function render() {
-  const c = state.counts;
+  const data = currentRes();
+  const c = data.counts;
+
+  document.getElementById('resLabel').textContent = currentResName();
+  document.getElementById('resetAll').textContent = '🗑 Wyczyść ' + currentResName();
 
   const counters = document.getElementById('counters');
   counters.innerHTML = '';
@@ -232,7 +280,8 @@ function render() {
     b.onclick = () => {
       const k = b.dataset.k;
       const d = parseInt(b.dataset.d);
-      state.counts[k] = Math.max(0, state.counts[k] + d);
+      const r = currentRes();
+      r.counts[k] = Math.max(0, r.counts[k] + d);
       save(); render();
     };
   });
@@ -240,7 +289,7 @@ function render() {
   let totalS = 0;
   TYPES.forEach(t => totalS += c[t.key] * t.mult);
 
-  const goalGold = state.goal || 0;
+  const goalGold = data.goal || 0;
   const goalGrey = goalGold * GOLDEN_MULT;
 
   document.getElementById('totalBoxes').textContent =
@@ -261,38 +310,53 @@ function render() {
 
   const conv = document.getElementById('conversion');
   const vals = [
-    ['Złote',    Math.floor(totalS/256)],
-    ['Fioletowe',Math.floor((totalS%256)/64)],
+    ['Złote',     Math.floor(totalS/256)],
+    ['Fioletowe', Math.floor((totalS%256)/64)],
     ['Niebieskie',Math.floor((totalS%64)/16)],
-    ['Zielone',  Math.floor((totalS%16)/4)],
-    ['Szare',    totalS%4]
+    ['Zielone',   Math.floor((totalS%16)/4)],
+    ['Szare',     totalS%4]
   ];
   conv.innerHTML = vals.map(v =>
     `<div class="conv-row"><span>${v[0]}</span><b>${v[1]}</b></div>`
   ).join('');
 }
 
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    state.activeRes = tab.dataset.res;
+    save();
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('goal').value = currentRes().goal;
+    render();
+    tickTimer();
+  };
+});
+
 document.getElementById('goal').addEventListener('input', e => {
-  state.goal = Math.max(0, parseInt(e.target.value) || 0);
+  currentRes().goal = Math.max(0, parseInt(e.target.value) || 0);
   save(); render();
 });
-document.getElementById('goal').value = state.goal;
 
 document.getElementById('resetAll').onclick = () => {
-  if (!confirm('Wyczyścić wszystkie skrzynie?')) return;
-  TYPES.forEach(t => state.counts[t.key] = 0);
+  if (!confirm('Wyczyścić skrzynie dla "' + currentResName() + '"?')) return;
+  currentRes().counts = emptyCounts();
   save(); render();
 };
 
-// TIMER
 function tickTimer() {
-  if (!state.timerStart) {
+  const data = currentRes();
+  const btnStart = document.getElementById('btnStart');
+  
+  if (!data.timerStart) {
     document.getElementById('timerTime').textContent = '00:00:00';
     document.getElementById('timerInfo').textContent = 'Kliknij START, aby zacząć';
     document.getElementById('timerProd').textContent = '';
+    btnStart.textContent = '▶ START';
     return;
   }
-  const diffMs = Date.now() - state.timerStart;
+  
+  const diffMs = Date.now() - data.timerStart;
   const totalSec = Math.floor(diffMs / 1000);
   const d = Math.floor(totalSec / 86400);
   const hh = String(Math.floor((totalSec % 86400) / 3600)).padStart(2,'0');
@@ -301,6 +365,7 @@ function tickTimer() {
   const prefix = d > 0 ? d + 'd ' : '';
   document.getElementById('timerTime').textContent = `${prefix}${hh}:${mm}:${ss}`;
   document.getElementById('timerInfo').textContent = 'Produkcja w toku…';
+  btnStart.textContent = '⏸ STOP';
 
   const hours = diffMs / 3600000;
   const produced = Math.floor(hours / BOX_TIME_HOURS);
@@ -309,28 +374,23 @@ function tickTimer() {
 }
 
 document.getElementById('btnStart').onclick = () => {
-  if (state.timerStart) {
-    state.timerStart = null;
-    document.getElementById('btnStart').textContent = '▶ START';
-  } else {
-    state.timerStart = Date.now();
-    document.getElementById('btnStart').textContent = '⏸ STOP';
-  }
+  const data = currentRes();
+  if (data.timerStart) data.timerStart = null;
+  else data.timerStart = Date.now();
   save();
   tickTimer();
 };
 
 document.getElementById('btnReset').onclick = () => {
-  state.timerStart = null;
-  document.getElementById('btnStart').textContent = '▶ START';
+  currentRes().timerStart = null;
   save();
   tickTimer();
 };
 
-if (state.timerStart) {
-  document.getElementById('btnStart').textContent = '⏸ STOP';
-}
-
+document.querySelectorAll('.tab').forEach(t =>
+  t.classList.toggle('active', t.dataset.res === state.activeRes)
+);
+document.getElementById('goal').value = currentRes().goal;
 setInterval(tickTimer, 1000);
 tickTimer();
 render();
