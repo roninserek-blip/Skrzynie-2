@@ -39,7 +39,7 @@
     }
     .box-grid {
       display: grid;
-      grid-template-columns: 16px repeat(4, 1fr);
+      grid-template-columns: 16px repeat(5, 1fr);
       gap: 5px 4px;
       align-items: center;
     }
@@ -51,6 +51,10 @@
       color: #38bdf8;
       background: #0f172a;
       border-radius: 6px;
+    }
+    .box-hdr.uniw {
+      color: #fbbf24;
+      background: #422006;
     }
     .dot {
       width: 14px;
@@ -78,8 +82,87 @@
       border-color: #38bdf8;
       background: #0b1220;
     }
+    .cell-inp.uniw {
+      color: #fbbf24;
+      border-color: #78350f;
+    }
+    .cell-inp.uniw:focus {
+      border-color: #fbbf24;
+    }
     .cell-inp::-webkit-outer-spin-button,
     .cell-inp::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .sub-header {
+      font-size: 10px;
+      color: #fbbf24;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin: 10px 0 6px;
+      padding-top: 8px;
+      border-top: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .alloc-row {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 6px 8px;
+      margin-bottom: 5px;
+    }
+    .alloc-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      margin-bottom: 5px;
+    }
+    .alloc-head .dot { width: 10px; height: 10px; margin: 0; }
+    .alloc-name { font-weight: 800; color: #fff; font-size: 11px; }
+    .alloc-info {
+      color: #94a3b8;
+      margin-left: auto;
+      font-size: 9px;
+      font-weight: 600;
+    }
+    .alloc-info.ok { color: #22c55e; }
+    .alloc-inputs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3px;
+    }
+    .alloc-lbl {
+      display: flex;
+      flex-direction: column;
+      font-size: 8px;
+      color: #64748b;
+      font-weight: 700;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .alloc-lbl input {
+      width: 100%;
+      padding: 5px 2px;
+      font-size: 12px;
+      font-weight: 800;
+      text-align: center;
+      background: #1e293b;
+      color: #fff;
+      border: 1px solid #334155;
+      border-radius: 5px;
+      font-family: inherit;
+      -moz-appearance: textfield;
+      margin-top: 2px;
+    }
+    .alloc-lbl input:focus {
+      outline: none;
+      border-color: #fbbf24;
+    }
+    .alloc-lbl input::-webkit-outer-spin-button,
+    .alloc-lbl input::-webkit-inner-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
@@ -108,10 +191,7 @@
       font-family: inherit;
       -moz-appearance: textfield;
     }
-    .goal-inp:focus {
-      outline: none;
-      border-color: #38bdf8;
-    }
+    .goal-inp:focus { outline: none; border-color: #38bdf8; }
     .goal-inp::-webkit-outer-spin-button,
     .goal-inp::-webkit-inner-spin-button {
       -webkit-appearance: none;
@@ -151,14 +231,8 @@
       margin-top: 2px;
       line-height: 1.4;
     }
-    .total-time-card {
-      text-align: center;
-      padding: 14px 8px;
-    }
-    .total-time-card h2 {
-      text-align: center;
-      margin-bottom: 6px;
-    }
+    .total-time-card { text-align: center; padding: 14px 8px; }
+    .total-time-card h2 { text-align: center; margin-bottom: 6px; }
     .total-time-val {
       font-size: 26px;
       font-weight: 800;
@@ -166,11 +240,7 @@
       letter-spacing: 1px;
       font-variant-numeric: tabular-nums;
     }
-    .total-time-lbl {
-      font-size: 10px;
-      color: #94a3b8;
-      margin-top: 2px;
-    }
+    .total-time-lbl { font-size: 10px; color: #94a3b8; margin-top: 2px; }
     .done-badge {
       display: inline-block;
       margin-top: 6px;
@@ -190,6 +260,10 @@
 <div class="card">
   <h2>Skrzynie</h2>
   <div class="box-grid" id="boxGrid"></div>
+  <div id="allocSection" style="display:none">
+    <div class="sub-header">🔄 Przydział uniwersalnych</div>
+    <div id="allocRows"></div>
+  </div>
 </div>
 
 <div class="card">
@@ -226,7 +300,12 @@ const BOX_TIME_HOURS = BASE_HOURS / BASE_BOXES;
 const GOLDEN_MULT = 256;
 
 function emptyCounts() { return {szara:0,zielona:0,niebieska:0,fioletowa:0,zlota:0}; }
-function emptyRes() { return {counts: emptyCounts(), goal: 1, timerStart: null}; }
+function emptyRes() { return {counts: emptyCounts(), goal: 1}; }
+function emptyUniv() {
+  const alloc = {};
+  RESOURCES.forEach(r => alloc[r.key] = 0);
+  return { total: 0, alloc };
+}
 
 function load() {
   try { return JSON.parse(localStorage.getItem('skrzynie')); } catch(e){ return null; }
@@ -234,19 +313,24 @@ function load() {
 function save() { localStorage.setItem('skrzynie', JSON.stringify(state)); }
 
 let state = load();
-if (!state || state.version !== 4) {
-  const oldCounts = state && state.counts ? state.counts : null;
-  const oldGoal = state && typeof state.goal === 'number' ? state.goal : 1;
-  const oldTimer = state && state.timerStart ? state.timerStart : null;
-  state = {
-    version: 4,
-    data: {
-      skora: { counts: oldCounts || emptyCounts(), goal: oldGoal, timerStart: oldTimer },
-      ruda: emptyRes(),
-      kosci: emptyRes(),
-      heban: emptyRes()
-    }
-  };
+if (!state || state.version !== 5) {
+  let data;
+  if (state && state.data) {
+    data = state.data;
+    RESOURCES.forEach(r => { if (!data[r.key]) data[r.key] = emptyRes(); });
+  } else if (state && state.counts) {
+    data = {
+      skora: { counts: state.counts, goal: state.goal || 1 },
+      ruda: emptyRes(), kosci: emptyRes(), heban: emptyRes()
+    };
+  } else {
+    data = {
+      skora: emptyRes(), ruda: emptyRes(),
+      kosci: emptyRes(), heban: emptyRes()
+    };
+  }
+  state = { version: 5, data, universal: {} };
+  TYPES.forEach(t => state.universal[t.key] = emptyUniv());
   save();
 }
 
@@ -263,7 +347,11 @@ function fmtDHM(hours) {
 function totalGrey(resKey) {
   const c = state.data[resKey].counts;
   let sum = 0;
-  TYPES.forEach(t => sum += c[t.key] * t.mult);
+  TYPES.forEach(t => {
+    sum += c[t.key] * t.mult;
+    const uAlloc = state.universal[t.key].alloc[resKey] || 0;
+    sum += uAlloc * t.mult;
+  });
   return sum;
 }
 
@@ -281,13 +369,17 @@ function buildSkrzynie() {
   RESOURCES.forEach(r => {
     html += `<div class="box-hdr">${r.name}</div>`;
   });
+  html += '<div class="box-hdr uniw">Uniw</div>';
   TYPES.forEach(t => {
     html += `<div class="dot" style="background:${t.color}" title="${t.name}"></div>`;
     RESOURCES.forEach(r => {
       const val = state.data[r.key].counts[t.key];
-      html += `<input class="cell-inp" type="number" min="0" step="1" inputmode="numeric"
+      html += `<input class="cell-inp" type="number" min="0" step="1" inputmode="numeric" pattern="[0-9]*"
         data-res="${r.key}" data-type="${t.key}" value="${val}">`;
     });
+    const uVal = state.universal[t.key].total;
+    html += `<input class="cell-inp uniw" type="number" min="0" step="1" inputmode="numeric" pattern="[0-9]*"
+      data-uniw-type="${t.key}" value="${uVal}">`;
   });
   el.innerHTML = html;
 }
@@ -298,7 +390,7 @@ function buildGoals() {
   RESOURCES.forEach(r => {
     html += `<div class="goal-col">
       <div class="goal-name">${r.name}</div>
-      <input class="goal-inp" type="number" min="0" step="1" inputmode="numeric"
+      <input class="goal-inp" type="number" min="0" step="1" inputmode="numeric" pattern="[0-9]*"
         data-goal="${r.key}" value="${state.data[r.key].goal}">
       <div class="goal-bar-wrap">
         <div class="goal-bar" data-goalbar="${r.key}"></div>
@@ -309,6 +401,47 @@ function buildGoals() {
     </div>`;
   });
   el.innerHTML = html;
+}
+
+function renderAlloc() {
+  const section = document.getElementById('allocSection');
+  const rows = document.getElementById('allocRows');
+  let anyUniv = false;
+  let html = '';
+  TYPES.forEach(t => {
+    const u = state.universal[t.key];
+    if (!u || u.total <= 0) return;
+    anyUniv = true;
+    const sum = RESOURCES.reduce((a, r) => a + (u.alloc[r.key] || 0), 0);
+    const left = u.total - sum;
+    html += `<div class="alloc-row" data-alloc-color="${t.key}">
+      <div class="alloc-head">
+        <span class="dot" style="background:${t.color}"></span>
+        <span class="alloc-name">${t.name}</span>
+        <span class="alloc-info${left === 0 ? ' ok' : ''}" data-alloc-info="${t.key}">${u.total} szt. · zostało: ${left}</span>
+      </div>
+      <div class="alloc-inputs">
+        ${RESOURCES.map(r => `
+          <label class="alloc-lbl">${r.name}
+            <input class="alloc-inp" type="number" min="0" step="1" inputmode="numeric" pattern="[0-9]*"
+              data-alloc-color="${t.key}" data-alloc-res="${r.key}" value="${u.alloc[r.key] || 0}">
+          </label>
+        `).join('')}
+      </div>
+    </div>`;
+  });
+  rows.innerHTML = html;
+  section.style.display = anyUniv ? 'block' : 'none';
+}
+
+function updateAllocInfo(colorKey) {
+  const u = state.universal[colorKey];
+  const sum = RESOURCES.reduce((a, r) => a + (u.alloc[r.key] || 0), 0);
+  const left = u.total - sum;
+  const info = document.querySelector(`[data-alloc-info="${colorKey}"]`);
+  if (!info) return;
+  info.textContent = `${u.total} szt. · zostało: ${left}`;
+  info.className = 'alloc-info' + (left === 0 ? ' ok' : '');
 }
 
 function refreshGoal(resKey) {
@@ -339,29 +472,81 @@ function refreshGoal(resKey) {
 function refreshSum() {
   let totalHours = 0;
   RESOURCES.forEach(r => totalHours += remainingHours(r.key));
-
-  const val = document.getElementById('totalTime');
-  const done = document.getElementById('totalDone');
-  val.textContent = fmtDHM(totalHours);
+  document.getElementById('totalTime').textContent = fmtDHM(totalHours);
 
   const allDone = RESOURCES.every(r => {
     const total = totalGrey(r.key);
     const goalGrey = state.data[r.key].goal * GOLDEN_MULT;
     return goalGrey > 0 && total >= goalGrey;
   });
+  document.getElementById('totalDone').innerHTML =
+    allDone ? '<span class="done-badge">✓ WSZYSTKIE CELE OSIĄGNIĘTE</span>' : '';
+}
 
-  done.innerHTML = allDone ? '<span class="done-badge">✓ WSZYSTKIE CELE OSIĄGNIĘTE</span>' : '';
+function setUniversalTotal(colorKey, newTotal) {
+  newTotal = Math.max(0, parseInt(newTotal) || 0);
+  const u = state.universal[colorKey];
+  u.total = newTotal;
+  const sum = RESOURCES.reduce((a, r) => a + (u.alloc[r.key] || 0), 0);
+  if (sum > newTotal) {
+    if (newTotal === 0) {
+      RESOURCES.forEach(r => u.alloc[r.key] = 0);
+    } else {
+      const scaled = RESOURCES.map(r => ({
+        r,
+        exact: (u.alloc[r.key] || 0) * newTotal / sum
+      }));
+      const floored = scaled.map(x => ({
+        r: x.r,
+        val: Math.floor(x.exact),
+        frac: x.exact - Math.floor(x.exact)
+      }));
+      let used = floored.reduce((a, x) => a + x.val, 0);
+      const remainder = newTotal - used;
+      floored.sort((a, b) => b.frac - a.frac);
+      for (let i = 0; i < remainder && i < floored.length; i++) floored[i].val++;
+      floored.forEach(x => u.alloc[x.r.key] = x.val);
+    }
+  }
+  save();
 }
 
 document.getElementById('boxGrid').addEventListener('input', e => {
-  const inp = e.target.closest('.cell-inp');
+  const inp = e.target;
+  if (inp.classList.contains('cell-inp') && inp.dataset.res) {
+    const res = inp.dataset.res;
+    const type = inp.dataset.type;
+    const val = Math.max(0, parseInt(inp.value) || 0);
+    state.data[res].counts[type] = val;
+    save();
+    refreshGoal(res);
+    refreshSum();
+  } else if (inp.classList.contains('cell-inp') && inp.dataset.uniwType) {
+    const colorKey = inp.dataset.uniwType;
+    setUniversalTotal(colorKey, inp.value);
+    renderAlloc();
+    RESOURCES.forEach(r => refreshGoal(r.key));
+    refreshSum();
+  }
+});
+
+document.getElementById('allocRows').addEventListener('input', e => {
+  const inp = e.target.closest('.alloc-inp');
   if (!inp) return;
-  const res = inp.dataset.res;
-  const type = inp.dataset.type;
-  const val = Math.max(0, parseInt(inp.value) || 0);
-  state.data[res].counts[type] = val;
+  const colorKey = inp.dataset.allocColor;
+  const resKey = inp.dataset.allocRes;
+  const u = state.universal[colorKey];
+  let value = Math.max(0, parseInt(inp.value) || 0);
+  const othersSum = RESOURCES
+    .filter(r => r.key !== resKey)
+    .reduce((a, r) => a + (u.alloc[r.key] || 0), 0);
+  const maxAllowed = Math.max(0, u.total - othersSum);
+  value = Math.min(value, maxAllowed);
+  u.alloc[resKey] = value;
+  if (parseInt(inp.value) !== value) inp.value = value;
   save();
-  refreshGoal(res);
+  updateAllocInfo(colorKey);
+  RESOURCES.forEach(r => refreshGoal(r.key));
   refreshSum();
 });
 
@@ -377,6 +562,7 @@ document.getElementById('goalGrid').addEventListener('input', e => {
 
 buildSkrzynie();
 buildGoals();
+renderAlloc();
 RESOURCES.forEach(r => refreshGoal(r.key));
 refreshSum();
 </script>
